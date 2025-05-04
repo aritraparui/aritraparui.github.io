@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AriX Player</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background-color: rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.2);
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+    }
+
+    nav button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    #searchSection, #homeSection, #playlistSection, #nowPlayingSection {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .song {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    iframe {
+      width: 100%;
+      height: 300px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    input {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <header>AriX Player</header>
+  <nav>
+    <button onclick="switchPage('home')">Home</button>
+    <button onclick="switchPage('search')">Search</button>
+    <button onclick="switchPage('playlist')">Playlists</button>
+    <button onclick="switchPage('nowPlaying')">Now Playing</button>
+  </nav>
+  <main>
+    <section id="homeSection" class="active">
+      <h2>Welcome to AriX Player</h2>
+      <p>Stream music powered by YouTube API.</p>
+    </section>
+
+    <section id="searchSection">
+      <input type="text" id="searchInput" placeholder="Search music...">
+      <div id="results"></div>
+    </section>
+
+    <section id="playlistSection">
+      <h2>Your Playlist</h2>
+      <div id="playlist"></div>
+    </section>
+
+    <section id="nowPlayingSection">
+      <h2>Now Playing</h2>
+      <div id="nowPlaying"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_KEY = 'AIzaSyBtRey4UY_MKDI2eKWdJhG3xZDPhXvdjpU';
+
+    const switchPage = (page) => {
+      document.querySelectorAll('main section').forEach(section => section.classList.remove('active'));
+      document.getElementById(`${page}Section`).classList.add('active');
+    };
+
+    document.getElementById('searchInput').addEventListener('input', async function () {
+      const query = this.value;
+      if (!query) return;
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(query)}&key=${API_KEY}`);
+      const data = await res.json();
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+
+      data.items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'song';
+        div.textContent = item.snippet.title;
+        div.onclick = () => playVideo(item.id.videoId, item.snippet.title);
+        results.appendChild(div);
+      });
+    });
+
+    function playVideo(videoId, title) {
+      const nowPlaying = document.getElementById('nowPlaying');
+      nowPlaying.innerHTML = `<h3>${title}</h3><iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay"></iframe>`;
+      switchPage('nowPlaying');
+      saveToPlaylist(videoId, title);
+    }
+
+    function saveToPlaylist(videoId, title) {
+      const playlist = JSON.parse(localStorage.getItem('arixPlaylist') || '[]');
+      playlist.push({ videoId, title });
+      localStorage.setItem('arixPlaylist', JSON.stringify(playlist));
+      renderPlaylist();
+    }
+
+    function renderPlaylist() {
+      const playlist = JSON.parse(localStorage.getItem('arixPlaylist') || '[]');
+      const container = document.getElementById('playlist');
+      container.innerHTML = '';
+      playlist.forEach(song => {
+        const div = document.createElement('div');
+        div.className = 'song';
+        div.textContent = song.title;
+        div.onclick = () => playVideo(song.videoId, song.title);
+        container.appendChild(div);
+      });
+    }
+
+    window.onload = renderPlaylist;
+  </script>
+</body>
+</html>
