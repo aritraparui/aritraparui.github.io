@@ -1,579 +1,251 @@
-// Global variables
-let player;
-let currentTrack = null;
-let queue = [];
-let currentTrackIndex = 0;
-let isPlaying = false;
-let isShuffled = false;
-let isRepeated = false;
-let volume = 80;
-let isMuted = false;
-let likedTracks = [];
-let playlists = [];
-let recentlyPlayed = [];
-let searchResults = {};
-let theme = 'light';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AriX Player - Your Personal Music Streaming App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="AriX Player Logo" class="logo">
+                <h1>AriX Player</h1>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li class="active"><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#search"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="#library"><i class="fas fa-music"></i> Your Library</a></li>
+                    <li><a href="#playlists"><i class="fas fa-list"></i> Playlists</a></li>
+                    <li><a href="#liked"><i class="fas fa-heart"></i> Liked Songs</a></li>
+                    <li><a href="#discover"><i class="fas fa-compass"></i> Discover</a></li>
+                </ul>
+            </nav>
+            <div class="user-playlists">
+                <h3>Your Playlists</h3>
+                <ul id="playlist-container">
+                    <!-- Playlists will be added here dynamically -->
+                </ul>
+                <button id="create-playlist-btn"><i class="fas fa-plus"></i> Create Playlist</button>
+            </div>
+            <div class="user-profile">
+                <img src="assets/user-icon.png" alt="User Profile" class="profile-pic">
+                <span class="username">User</span>
+            </div>
+        </div>
 
-// YouTube API Key
-const YOUTUBE_API_KEY = 'AIzaSyBtRey4UY_MKDI2eKWdJhG3xZDPhXvdjpU';
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Home Page -->
+            <div id="home" class="page active-page">
+                <div class="hero-section">
+                    <h2>Welcome back!</h2>
+                    <p>What would you like to listen to today?</p>
+                    <div class="search-box">
+                        <input type="text" placeholder="Search for songs, artists, or albums...">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Recently Played</h3>
+                    <div class="card-container" id="recently-played">
+                        <!-- Recently played items will be added here -->
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Top Charts</h3>
+                    <div class="card-container" id="top-charts">
+                        <!-- Top charts will be added here -->
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Recommended For You</h3>
+                    <div class="card-container" id="recommendations">
+                        <!-- Recommendations will be added here -->
+                    </div>
+                </div>
+            </div>
 
-// DOM Elements
-const audioPlayer = document.getElementById('audio-player');
-const playBtn = document.getElementById('play-btn');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const shuffleBtn = document.getElementById('shuffle-btn');
-const repeatBtn = document.getElementById('repeat-btn');
-const progressSlider = document.getElementById('progress-slider');
-const currentTimeEl = document.getElementById('current-time');
-const durationEl = document.getElementById('duration');
-const volumeSlider = document.getElementById('volume-slider');
-const volumeBtn = document.getElementById('volume-btn');
-const likeBtn = document.getElementById('like-btn');
-const queueBtn = document.getElementById('queue-btn');
-const lyricsBtn = document.getElementById('lyrics-btn');
-const queueModal = document.getElementById('queue-modal');
-const lyricsModal = document.getElementById('lyrics-modal');
-const closeModals = document.querySelectorAll('.close-modal');
-const playlistModal = document.getElementById('playlist-modal');
-const createPlaylistBtn = document.getElementById('create-playlist-btn');
-const playlistForm = document.getElementById('playlist-form');
-const searchInput = document.getElementById('search-input');
-const homeSearchInput = document.getElementById('home-search-input');
-const searchBtn = document.getElementById('search-btn');
-const homeSearchBtn = document.getElementById('home-search-btn');
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
-const nowPlayingTitle = document.getElementById('now-playing-title');
-const nowPlayingArtist = document.getElementById('now-playing-artist');
-const nowPlayingCover = document.getElementById('now-playing-cover');
-const themeToggle = document.getElementById('theme-toggle');
-const themeSelect = document.getElementById('theme-select');
-const playAllBtn = document.getElementById('play-all-btn');
-const clearCacheBtn = document.getElementById('clear-cache-btn');
+            <!-- Search Page -->
+            <div id="search" class="page">
+                <div class="search-header">
+                    <h2>Search</h2>
+                    <div class="search-box-large">
+                        <input type="text" id="search-input" placeholder="Artists, songs, or albums...">
+                        <button id="search-btn"><i class="fas fa-search"></i> Search</button>
+                    </div>
+                </div>
+                
+                <div class="search-results">
+                    <div class="search-tabs">
+                        <button class="tab-btn active" data-tab="songs">Songs</button>
+                        <button class="tab-btn" data-tab="artists">Artists</button>
+                        <button class="tab-btn" data-tab="albums">Albums</button>
+                        <button class="tab-btn" data-tab="playlists">Playlists</button>
+                    </div>
+                    
+                    <div id="songs" class="tab-content active">
+                        <table class="songs-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Artist</th>
+                                    <th>Album</th>
+                                    <th><i class="far fa-clock"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="songs-results">
+                                <!-- Song results will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="artists" class="tab-content">
+                        <div class="card-container" id="artists-results">
+                            <!-- Artist results will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div id="albums" class="tab-content">
+                        <div class="card-container" id="albums-results">
+                            <!-- Album results will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div id="playlists" class="tab-content">
+                        <div class="card-container" id="playlists-results">
+                            <!-- Playlist results will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-// Initialize the app
-document.addEventListener('DOMContentLoaded', () => {
-    loadData();
-    setupEventListeners();
-    showPage('home');
-    fetchTopCharts();
-    fetchRecommendations();
-    fetchNewReleases();
-    
-    // Load YouTube IFrame API
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    
-    // Initialize volume
-    audioPlayer.volume = volume / 100;
-    volumeSlider.value = volume;
-    
-    // Check system preference for dark mode
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setTheme('dark');
-    }
-});
+            <!-- Library Page -->
+            <div id="library" class="page">
+                <h2>Your Library</h2>
+                <div class="library-filters">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Playlists</button>
+                    <button class="filter-btn">Artists</button>
+                    <button class="filter-btn">Albums</button>
+                </div>
+                
+                <div class="library-content">
+                    <div class="library-grid" id="library-items">
+                        <!-- Library items will be added here -->
+                    </div>
+                </div>
+            </div>
 
-// YouTube Player API
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('youtube-player', {
-        height: '0',
-        width: '0',
-        playerVars: {
-            'autoplay': 0,
-            'controls': 0,
-            'disablekb': 1,
-            'enablejsapi': 1,
-            'fs': 0,
-            'modestbranding': 1,
-            'origin': window.location.origin
-        },
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
+            <!-- Other pages would follow the same pattern -->
+        </div>
 
-function onPlayerReady(event) {
-    console.log('YouTube player ready');
-}
-
-function onPlayerStateChange(event) {
-    switch(event.data) {
-        case YT.PlayerState.PLAYING:
-            isPlaying = true;
-            updatePlayButton();
-            updateNowPlayingInfo();
-            updateProgress();
-            break;
-        case YT.PlayerState.PAUSED:
-            isPlaying = false;
-            updatePlayButton();
-            break;
-        case YT.PlayerState.ENDED:
-            if (isRepeated) {
-                player.playVideo();
-            } else {
-                nextTrack();
-            }
-            break;
-        case YT.PlayerState.BUFFERING:
-            console.log('Buffering...');
-            break;
-        case YT.PlayerState.CUED:
-            console.log('Video cued');
-            break;
-        case YT.PlayerState.ERROR:
-            console.error('YouTube player error');
-            handlePlaybackError();
-            break;
-    }
-}
-
-function handlePlaybackError() {
-    if (!currentTrack) return;
-    
-    // Fallback to audio element
-    console.log('Attempting fallback playback');
-    audioPlayer.src = `https://www.youtube.com/watch?v=${currentTrack.videoId}`;
-    audioPlayer.play().catch(e => {
-        console.error('Fallback playback failed:', e);
-        alert('Playback failed. Please try another song.');
-    });
-}
-
-// Load data from localStorage
-function loadData() {
-    likedTracks = JSON.parse(localStorage.getItem('likedTracks')) || [];
-    playlists = JSON.parse(localStorage.getItem('playlists')) || [];
-    recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed')) || [];
-    theme = localStorage.getItem('theme') || 'light';
-    
-    // Apply saved theme
-    setTheme(theme);
-    if (themeSelect) themeSelect.value = theme;
-    
-    renderPlaylists();
-    renderRecentlyPlayed();
-    renderLikedSongs();
-}
-
-// Save data to localStorage
-function saveData() {
-    localStorage.setItem('likedTracks', JSON.stringify(likedTracks));
-    localStorage.setItem('playlists', JSON.stringify(playlists));
-    localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
-    localStorage.setItem('theme', theme);
-}
-
-// Setup event listeners
-function setupEventListeners() {
-    // Player controls
-    playBtn.addEventListener('click', togglePlay);
-    prevBtn.addEventListener('click', prevTrack);
-    nextBtn.addEventListener('click', nextTrack);
-    shuffleBtn.addEventListener('click', toggleShuffle);
-    repeatBtn.addEventListener('click', toggleRepeat);
-    likeBtn.addEventListener('click', toggleLike);
-    queueBtn.addEventListener('click', () => queueModal.classList.add('active'));
-    lyricsBtn.addEventListener('click', showLyrics);
-    
-    // Progress control
-    progressSlider.addEventListener('input', seekTo);
-    progressSlider.addEventListener('change', seekTo);
-    
-    // Volume control
-    volumeSlider.addEventListener('input', setVolume);
-    volumeBtn.addEventListener('click', toggleMute);
-    
-    // Modals
-    closeModals.forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('active');
-            });
-        });
-    });
-    
-    // Playlist creation
-    createPlaylistBtn.addEventListener('click', () => playlistModal.classList.add('active'));
-    playlistForm.addEventListener('submit', createPlaylist);
-    
-    // Search functionality
-    searchBtn.addEventListener('click', performSearch);
-    homeSearchBtn.addEventListener('click', () => {
-        const query = homeSearchInput.value.trim();
-        if (query) {
-            searchInput.value = query;
-            performSearch();
-        }
-    });
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') performSearch();
-    });
-    homeSearchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = homeSearchInput.value.trim();
-            if (query) {
-                searchInput.value = query;
-                performSearch();
-            }
-        }
-    });
-    
-    // Tab switching
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
+        <!-- Now Playing Bar -->
+        <div class="now-playing-bar">
+            <div class="track-info">
+                <img src="" alt="Album Cover" id="now-playing-cover" class="album-cover">
+                <div class="track-details">
+                    <span id="now-playing-title">Not Playing</span>
+                    <span id="now-playing-artist">-</span>
+                </div>
+                <button id="like-btn"><i class="far fa-heart"></i></button>
+            </div>
             
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.tab).classList.add('active');
-        });
-    });
-    
-    // Navigation
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            showPage(link.getAttribute('href').substring(1));
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button id="shuffle-btn"><i class="fas fa-random"></i></button>
+                    <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                    <button id="play-btn"><i class="fas fa-play"></i></button>
+                    <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+                    <button id="repeat-btn"><i class="fas fa-redo"></i></button>
+                </div>
+                <div class="progress-container">
+                    <span id="current-time">0:00</span>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
             
-            document.querySelectorAll('.nav-links li').forEach(li => {
-                li.classList.remove('active');
-            });
-            
-            link.parentElement.classList.add('active');
-        });
-    });
-    
-    // Theme toggle
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-    
-    if (themeSelect) {
-        themeSelect.addEventListener('change', (e) => {
-            setTheme(e.target.value);
-        });
-    }
-    
-    // Play all button
-    if (playAllBtn) {
-        playAllBtn.addEventListener('click', playAllLikedSongs);
-    }
-    
-    // Clear cache
-    if (clearCacheBtn) {
-        clearCacheBtn.addEventListener('click', clearCache);
-    }
-    
-    // Click outside modal to close
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            e.target.classList.remove('active');
-        }
-    });
-}
+            <div class="extra-controls">
+                <button id="queue-btn"><i class="fas fa-list"></i></button>
+                <button id="device-btn"><i class="fas fa-mobile-alt"></i></button>
+                <div class="volume-control">
+                    <button id="volume-btn"><i class="fas fa-volume-up"></i></button>
+                    <input type="range" id="volume-slider" min="0" max="100" value="80">
+                </div>
+            </div>
+        </div>
 
-// Page navigation
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active-page');
-    });
-    
-    const page = document.getElementById(pageId);
-    if (page) {
-        page.classList.add('active-page');
-        
-        // Load content for specific pages
-        if (pageId === 'liked') {
-            renderLikedSongs();
-        }
-    }
-}
+        <!-- Audio Element -->
+        <audio id="audio-player"></audio>
 
-// Theme functions
-function toggleTheme() {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-}
+        <!-- Queue Modal -->
+        <div class="modal" id="queue-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Queue</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="queue-current">
+                        <h4>Now Playing</h4>
+                        <div id="now-playing-queue-item">
+                            <!-- Current track will be shown here -->
+                        </div>
+                    </div>
+                    <div class="queue-upcoming">
+                        <h4>Next In Queue</h4>
+                        <ul id="upcoming-queue">
+                            <!-- Upcoming tracks will be shown here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-function setTheme(newTheme) {
-    theme = newTheme;
-    document.body.className = `${theme}-mode`;
-    
-    // Update toggle button icon
-    if (themeToggle) {
-        themeToggle.innerHTML = `<i class="fas fa-${theme === 'light' ? 'moon' : 'sun'}"></i>`;
-    }
-    
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
-}
+        <!-- Playlist Modal -->
+        <div class="modal" id="playlist-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New Playlist</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="playlist-form">
+                        <div class="form-group">
+                            <label for="playlist-name">Playlist Name</label>
+                            <input type="text" id="playlist-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playlist-desc">Description (Optional)</label>
+                            <textarea id="playlist-desc"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="playlist-visibility">Visibility</label>
+                            <select id="playlist-visibility">
+                                <option value="public">Public</option>
+                                <option value="private">Private</option>
+                            </select>
+                        </div>
+                        <button type="submit">Create Playlist</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// Player controls
-function togglePlay() {
-    if (!currentTrack) return;
-    
-    if (isPlaying) {
-        if (player && player.pauseVideo) {
-            player.pauseVideo();
-        } else {
-            audioPlayer.pause();
-        }
-    } else {
-        if (player && player.playVideo) {
-            player.playVideo();
-        } else {
-            audioPlayer.play().catch(e => {
-                console.error('Audio playback error:', e);
-                handlePlaybackError();
-            });
-        }
-    }
-}
-
-function updatePlayButton() {
-    const icon = playBtn.querySelector('i');
-    if (isPlaying) {
-        icon.classList.remove('fa-play');
-        icon.classList.add('fa-pause');
-    } else {
-        icon.classList.remove('fa-pause');
-        icon.classList.add('fa-play');
-    }
-}
-
-function playTrack(track, index = 0) {
-    if (!track) return;
-    
-    currentTrack = track;
-    currentTrackIndex = index;
-    
-    // Try YouTube player first
-    if (player && player.loadVideoById) {
-        player.loadVideoById(track.videoId);
-        player.playVideo().catch(e => {
-            console.error('YouTube playback error:', e);
-            handlePlaybackError();
-        });
-    } else {
-        // Fallback to audio element
-        audioPlayer.src = `https://www.youtube.com/watch?v=${track.videoId}`;
-        audioPlayer.play().catch(e => {
-            console.error('Fallback playback error:', e);
-            alert('Playback failed. Please try another song.');
-        });
-    }
-    
-    // Add to recently played
-    addToRecentlyPlayed(track);
-    
-    // Update UI
-    updateNowPlayingInfo();
-    updateLikeButton();
-    updateQueueDisplay();
-    
-    // Try to fetch lyrics
-    fetchLyrics(track);
-}
-
-function updateNowPlayingInfo() {
-    if (!currentTrack) return;
-    
-    nowPlayingTitle.textContent = currentTrack.title;
-    nowPlayingArtist.textContent = currentTrack.artist || 'Unknown Artist';
-    nowPlayingCover.src = currentTrack.thumbnail || 'assets/default-cover.jpg';
-    document.title = `${currentTrack.title} - AriX Player`;
-}
-
-function prevTrack() {
-    if (queue.length === 0) return;
-    
-    currentTrackIndex = (currentTrackIndex - 1 + queue.length) % queue.length;
-    playTrack(queue[currentTrackIndex], currentTrackIndex);
-}
-
-function nextTrack() {
-    if (queue.length === 0) return;
-    
-    currentTrackIndex = (currentTrackIndex + 1) % queue.length;
-    playTrack(queue[currentTrackIndex], currentTrackIndex);
-}
-
-function toggleShuffle() {
-    isShuffled = !isShuffled;
-    shuffleBtn.classList.toggle('active', isShuffled);
-    
-    if (isShuffled) {
-        shuffleQueue();
-    }
-}
-
-function shuffleQueue() {
-    if (queue.length <= 1) return;
-    
-    // Save current track
-    const current = queue[currentTrackIndex];
-    
-    // Shuffle the rest
-    for (let i = queue.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [queue[i], queue[j]] = [queue[j], queue[i]];
-    }
-    
-    // Find the new index of the current track
-    currentTrackIndex = queue.indexOf(current);
-    
-    updateQueueDisplay();
-}
-
-function toggleRepeat() {
-    isRepeated = !isRepeated;
-    repeatBtn.classList.toggle('active', isRepeated);
-}
-
-function toggleLike() {
-    if (!currentTrack) return;
-    
-    const index = likedTracks.findIndex(t => t.videoId === currentTrack.videoId);
-    
-    if (index === -1) {
-        likedTracks.push(currentTrack);
-    } else {
-        likedTracks.splice(index, 1);
-    }
-    
-    updateLikeButton();
-    saveData();
-    renderLikedSongs();
-}
-
-function updateLikeButton() {
-    if (!currentTrack) return;
-    
-    const isLiked = likedTracks.some(t => t.videoId === currentTrack.videoId);
-    likeBtn.classList.toggle('liked', isLiked);
-    likeBtn.innerHTML = `<i class="fas fa-heart${isLiked ? '' : '-o'}"></i>`;
-}
-
-// Progress controls
-function updateProgress() {
-    if (!currentTrack) return;
-    
-    let duration, currentTime;
-    
-    if (player && player.getDuration) {
-        duration = player.getDuration();
-        currentTime = player.getCurrentTime();
-    } else {
-        duration = audioPlayer.duration || 0;
-        currentTime = audioPlayer.currentTime || 0;
-    }
-    
-    // Update progress slider
-    if (duration > 0) {
-        const progressPercent = (currentTime / duration) * 100;
-        progressSlider.value = progressPercent;
-    }
-    
-    // Update time display
-    currentTimeEl.textContent = formatTime(currentTime);
-    durationEl.textContent = formatTime(duration);
-    
-    // Continue updating if playing
-    if (isPlaying) {
-        requestAnimationFrame(updateProgress);
-    }
-}
-
-function seekTo(e) {
-    if (!currentTrack) return;
-    
-    const seekPercent = e.target.value;
-    
-    if (player && player.getDuration) {
-        const duration = player.getDuration();
-        const seekTime = (seekPercent / 100) * duration;
-        player.seekTo(seekTime, true);
-    } else if (audioPlayer.duration) {
-        const seekTime = (seekPercent / 100) * audioPlayer.duration;
-        audioPlayer.currentTime = seekTime;
-    }
-}
-
-function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-}
-
-// Volume controls
-function setVolume() {
-    volume = this.value;
-    audioPlayer.volume = volume / 100;
-    
-    if (player && player.setVolume) {
-        player.setVolume(volume);
-    }
-    
-    // Update volume icon
-    updateVolumeIcon();
-}
-
-function toggleMute() {
-    isMuted = !isMuted;
-    
-    if (player && player.setVolume) {
-        player.setVolume(isMuted ? 0 : volume);
-    } else {
-        audioPlayer.volume = isMuted ? 0 : volume / 100;
-    }
-    
-    updateVolumeIcon();
-}
-
-function updateVolumeIcon() {
-    if (isMuted || volume == 0) {
-        volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-    } else if (volume < 50) {
-        volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
-    } else {
-        volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    }
-}
-
-// Queue management
-function addToQueue(track, playNow = false) {
-    if (playNow) {
-        queue.unshift(track);
-        playTrack(track, 0);
-    } else {
-        queue.push(track);
-    }
-    
-    updateQueueDisplay();
-}
-
-function updateQueueDisplay() {
-    const nowPlayingItem = document.getElementById('now-playing-queue-item');
-    const upcomingQueue = document.getElementById('upcoming-queue');
-    
-    // Clear existing items
-    nowPlayingItem.innerHTML = '';
-    upcomingQueue.innerHTML = '';
-    
-    if (!currentTrack) return;
-    
-    // Add current track
-    nowPlayingItem.innerHTML = `
-        <div class="queue-item">
-            <img src="${currentTrack.thumbnail || 'assets/default-cover.jpg'}" alt="Cover" class="queue-item-img">
-            <div class="queue-item-info">
-                <h5>${currentTrack.title}</h5>
-                <p>
+    <script src="script.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
