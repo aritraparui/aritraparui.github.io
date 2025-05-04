@@ -576,4 +576,4 @@ function updateQueueDisplay() {
             <img src="${currentTrack.thumbnail || 'assets/default-cover.jpg'}" alt="Cover" class="queue-item-img">
             <div class="queue-item-info">
                 <h5>${currentTrack.title}</h5>
-                <p>
+               
