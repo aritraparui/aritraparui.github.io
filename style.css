@@ -84,3 +84,17 @@ footer #player button {
   font-size: 1.5rem;
   cursor: pointer;
 }
+
+#playlist .song,
+#search-results .song {
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.3s;
+}
+
+#playlist .song:hover,
+#search-results .song:hover {
+  background-color: #f0f0f0;
+}
