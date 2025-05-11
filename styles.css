@@ -34,6 +34,7 @@ body {
     background-color: var(--surface-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 10;
+    position: relative;
 }
 
 .nav-button, .icon-button {
@@ -62,6 +63,15 @@ body {
     flex-grow: 1;
     overflow-y: auto;
     padding-bottom: 80px;
+    position: relative;
+}
+
+.page {
+    padding-bottom: 60px;
+}
+
+.hidden {
+    display: none;
 }
 
 .section {
@@ -118,7 +128,8 @@ body {
     text-overflow: ellipsis;
 }
 
-.search-view {
+/* Search Page */
+.search-page {
     position: absolute;
     top: 0;
     left: 0;
@@ -126,7 +137,6 @@ body {
     bottom: 0;
     background-color: var(--background-color);
     z-index: 20;
-    padding-top: 60px;
 }
 
 .search-bar {
@@ -152,13 +162,162 @@ body {
     padding: 0 16px;
 }
 
-.hidden {
-    display: none;
+/* Library Page */
+.library-header {
+    padding: 16px;
+    padding-bottom: 8px;
 }
 
-.player-bar {
+.library-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.library-categories {
+    display: flex;
+    padding: 16px;
+    gap: 16px;
+    overflow-x: auto;
+}
+
+.category-card {
+    background-color: var(--surface-color);
+    padding: 16px;
+    border-radius: 8px;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-card span:first-child {
+    font-size: 2rem;
+}
+
+/* Detail Page */
+.detail-header {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.detail-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    z-index: 1;
+}
+
+.detail-info {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    z-index: 2;
+}
+
+.detail-info img {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.detail-info h2 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.detail-controls {
+    padding: 20px;
+}
+
+.play-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.song-list {
+    padding: 0 16px;
+}
+
+.song-list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.song-list-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    margin-right: 16px;
+}
+
+.song-list-info {
+    flex-grow: 1;
+}
+
+.song-list-info h3 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.song-list-info p {
+    font-size: 0.8rem;
+    color: var(--on-surface);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
     position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--surface-color);
+    border-top: 1px solid var(--divider-color);
+    z-index: 100;
+    padding: 8px 0;
+}
+
+.bottom-nav .nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7rem;
+    gap: 4px;
+    color: var(--on-surface);
+}
+
+.bottom-nav .nav-button.active {
+    color: var(--primary-color);
+}
+
+.bottom-nav .nav-button span:first-child {
+    font-size: 1.5rem;
+}
+
+/* Player Bar */
+.player-bar {
+    position: fixed;
+    bottom: 60px;
     left: 0;
     right: 0;
     height: 72px;
@@ -224,6 +383,7 @@ body {
     transform: scale(1.5);
 }
 
+/* Full Player */
 .full-player {
     position: fixed;
     top: 0;
@@ -347,5 +507,13 @@ body {
 @media (min-width: 900px) {
     .song-grid {
         grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .bottom-nav {
+        display: none;
+    }
+    
+    .sidebar {
+        display: block;
     }
 }

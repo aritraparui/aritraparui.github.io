@@ -13,10 +13,10 @@
     <div class="app-container">
         <!-- Top Navigation -->
         <header class="app-header">
-            <button class="nav-button" id="menuButton">
-                <span class="material-icons">menu</span>
+            <button class="nav-button" id="backButton" style="display: none;">
+                <span class="material-icons">arrow_back</span>
             </button>
-            <h1 class="app-title">AriX Music</h1>
+            <h1 class="app-title" id="pageTitle">AriX Music</h1>
             <div class="header-actions">
                 <button class="icon-button" id="searchButton">
                     <span class="material-icons">search</span>
@@ -29,7 +29,8 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <div class="home-view" id="homeView">
+            <!-- Home Page -->
+            <div class="page" id="homePage">
                 <section class="section">
                     <h2 class="section-title">Trending Now</h2>
                     <div class="song-grid" id="trendingSongs"></div>
@@ -39,16 +40,85 @@
                     <h2 class="section-title">Top Charts</h2>
                     <div class="song-grid" id="topCharts"></div>
                 </section>
+                
+                <section class="section">
+                    <h2 class="section-title">Recently Played</h2>
+                    <div class="song-grid" id="recentSongs"></div>
+                </section>
             </div>
 
-            <div class="search-view hidden" id="searchView">
+            <!-- Search Page -->
+            <div class="page hidden" id="searchPage">
                 <div class="search-bar">
                     <span class="material-icons">search</span>
-                    <input type="text" placeholder="Search songs, artists..." id="searchInput">
+                    <input type="text" placeholder="Search songs, artists..." id="searchInput" autocomplete="off">
                 </div>
                 <div class="search-results" id="searchResults"></div>
             </div>
+
+            <!-- Library Page -->
+            <div class="page hidden" id="libraryPage">
+                <div class="library-header">
+                    <h2>Your Library</h2>
+                </div>
+                <div class="library-categories">
+                    <div class="category-card" id="playlistsBtn">
+                        <span class="material-icons">queue_music</span>
+                        <span>Playlists</span>
+                    </div>
+                    <div class="category-card" id="artistsBtn">
+                        <span class="material-icons">people</span>
+                        <span>Artists</span>
+                    </div>
+                    <div class="category-card" id="albumsBtn">
+                        <span class="material-icons">album</span>
+                        <span>Albums</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">Recently Added</h2>
+                    <div class="song-grid" id="librarySongs"></div>
+                </div>
+            </div>
+
+            <!-- Playlist/Album Detail Page -->
+            <div class="page hidden" id="detailPage">
+                <div class="detail-header" id="detailHeader">
+                    <div class="detail-backdrop"></div>
+                    <div class="detail-info">
+                        <img id="detailImage" src="https://via.placeholder.com/150">
+                        <div>
+                            <h2 id="detailTitle">Playlist</h2>
+                            <p id="detailSubtitle">Description</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-controls">
+                    <button class="play-button" id="playAllButton">
+                        <span class="material-icons">play_arrow</span>
+                        <span>Play</span>
+                    </button>
+                </div>
+                <div class="song-list" id="detailSongs"></div>
+            </div>
         </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-button active" id="homeButton">
+                <span class="material-icons">home</span>
+                <span>Home</span>
+            </button>
+            <button class="nav-button" id="searchNavButton">
+                <span class="material-icons">search</span>
+                <span>Search</span>
+            </button>
+            <button class="nav-button" id="libraryButton">
+                <span class="material-icons">library_music</span>
+                <span>Library</span>
+            </button>
+        </nav>
 
         <!-- Bottom Player -->
         <div class="player-bar" id="playerBar">
@@ -72,7 +142,7 @@
                 <button class="icon-button" id="closeFullPlayer">
                     <span class="material-icons">expand_more</span>
                 </button>
-                <h2 class="full-player-title" id="fullPlayerTitle">Now Playing</h2>
+                <h2 class="full-player-title">Now Playing</h2>
                 <button class="icon-button">
                     <span class="material-icons">more_vert</span>
                 </button>
@@ -99,31 +169,31 @@
                 </div>
 
                 <div class="player-controls">
-                    <button class="control-button">
+                    <button class="control-button" id="shuffleButton">
                         <span class="material-icons">shuffle</span>
                     </button>
-                    <button class="control-button">
+                    <button class="control-button" id="prevButton">
                         <span class="material-icons">skip_previous</span>
                     </button>
                     <button class="control-button large" id="fullPlayerPlayButton">
                         <span class="material-icons">play_arrow</span>
                     </button>
-                    <button class="control-button">
+                    <button class="control-button" id="nextButton">
                         <span class="material-icons">skip_next</span>
                     </button>
-                    <button class="control-button">
+                    <button class="control-button" id="repeatButton">
                         <span class="material-icons">repeat</span>
                     </button>
                 </div>
 
                 <div class="extra-controls">
-                    <button class="control-button">
+                    <button class="control-button" id="likeButton">
                         <span class="material-icons">favorite_border</span>
                     </button>
-                    <button class="control-button">
+                    <button class="control-button" id="addToPlaylistButton">
                         <span class="material-icons">playlist_add</span>
                     </button>
-                    <button class="control-button">
+                    <button class="control-button" id="downloadButton">
                         <span class="material-icons">download</span>
                     </button>
                 </div>
