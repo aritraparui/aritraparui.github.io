@@ -3,56 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AriX Player</title>
+    <title>Aritra Parui Music</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>AriX Player</h1>
-            <nav>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#search">Search</a></li>
-                    <li><a href="#library">Library</a></li>
-                    <li><a href="#settings">Settings</a></li>
-                </ul>
-            </nav>
+    <div class="container">
+        <header class="glass">
+            <h1>Aritra Parui</h1>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for songs, artists...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </header>
+
+        <main>
+            <div class="hero glass">
+                <h2>Discover New Music</h2>
+                <p>Search for your favorite songs and enjoy unlimited streaming</p>
+            </div>
+
+            <div id="featured-section" class="glass">
+                <h3>Featured Playlists</h3>
+                <div class="playlist-grid" id="featured-playlists">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div id="search-results" class="glass" style="display: none;">
+                <h3>Search Results</h3>
+                <div class="results-grid" id="results-container">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+
+        <div class="player-container glass">
+            <div class="player">
+                <div class="song-info">
+                    <img id="current-song-art" src="https://via.placeholder.com/50" alt="Album Art">
+                    <div>
+                        <div id="current-song-title">No song selected</div>
+                        <div id="current-song-artist">Search and play a song</div>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                    <button id="play-btn"><i class="fas fa-play"></i></button>
+                    <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+                </div>
+                <div class="progress-container">
+                    <span id="current-time">0:00</span>
+                    <input type="range" id="progress-bar" value="0">
+                    <span id="duration">0:00</span>
+                </div>
+                <div class="volume-control">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.7">
+                </div>
+            </div>
         </div>
-    </header>
-    <main>
-        <section id="home" class="section">
-            <div class="container">
-                <h2>Welcome to AriX Player</h2>
-                <p>Explore and enjoy millions of songs.</p>
-            </div>
-        </section>
-        <section id="search" class="section">
-            <div class="container">
-                <h2>Search</h2>
-                <input type="text" id="searchInput" placeholder="Search for songs...">
-                <button onclick="searchSongs()">Search</button>
-                <div id="searchResults"></div>
-            </div>
-        </section>
-        <section id="library" class="section">
-            <div class="container">
-                <h2>Library</h2>
-                <p>Your saved songs will appear here.</p>
-            </div>
-        </section>
-        <section id="settings" class="section">
-            <div class="container">
-                <h2>Settings</h2>
-                <p>Customize your experience.</p>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 AriX Player. All rights reserved.</p>
-        </div>
-    </footer>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
